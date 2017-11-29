@@ -22,8 +22,18 @@ Run the following commands in Terminal or PowerShell:
 - When you think you have all your balances, simply hit the `i`-key.
 
 ## What to do next
-- If the tool says `The balance is currently in the address` to all addresses found, use https://github.com/peterwilli/IOTA-Snapshot-Recovery to quickly and easily transfer your balance to a new seed
+- If the tool says `The balance is currently in the address` to all addresses found, see the snapshot recovery instructions below.
+
 - If the tool says `CURL_UNUSED`, `CURL_NOT_TRANSITIONED`, `KEY_REUSE`, or `KEY_REUSE_OCT` you must use the reclaim tool
+
+## Snapshot recovery
+Run these commands to transfer your balance to a new seed. Ensure that you are not in the "balance-finder" directory. If you are, run `cd ..` first.
+- `git clone https://github.com/peterwilli/IOTA-Snapshot-Recovery.git snapshot-recovery`
+- `cd snapshot-recovery`
+- `git checkout d850c2b33b96be0f42df8c715bc05588e245753d`
+- `npm install`
+- `node main.js <old seed> <new seed>` make sure to remove the arrows!
+- When you think you have all your balances, simply hit the `i` -key and the balance will be transferred.
 
 ## Did this tool help you?
 Please consider donating to help create more tools like this:
