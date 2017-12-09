@@ -1,6 +1,8 @@
 var vm = require("vm");
 var fs = require('fs');
 
+
+// Load the old JS file (meant for the web and not for node) for old (pre-transitioned) address generation
 var getPreTransitionIota = function() {
   var oldIotaPath = './pre-trans-generator/js/iota.js'
   filedata = fs.readFileSync(oldIotaPath,'utf8');
@@ -96,7 +98,7 @@ var getNewAddressCallback = function(e, d, index, amountToScan) {
 
 
 if (searchPreTransitioned) {
-  console.log('Adress Search Type: Pre-Transitioned');
+  console.log('Address Search Type: Pre-Transitioned');
 } else {
   console.log('Address Search Type: Regular');
 }
