@@ -1,0 +1,3 @@
+[submodule "pre-trans-generator"]
+	path = pre-trans-generator
+	url = https://github.com/domschiener/iota-address-generator
