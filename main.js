@@ -13,24 +13,35 @@ var getPreTransitionIota = function() {
   var context = {};
   vm.runInNewContext(filedata, context, oldIotaPath);
 
-  return new context.window.IOTA();  
+  return new context.window.IOTA();
 }
 
 
 var IOTA = require('iota.lib.js');
 var iota = new IOTA({
-  'provider': 'http://node01.iotameetup.nl:14265'
+  'provider': 'http://iotanode.us:443'
 });
 var iotaOld = getPreTransitionIota();
 var seed = process.argv[2] + "" // in case the seed is all 9's (GOSH I HOPE NOT)
-var searchPreTransitioned = process.argv[3] === 'p'; 
+var searchPreTransitioned = process.argv[3] === 'p';
 var status = 'checking'
 var snapshotSep = fs.readFileSync('snapshot_september.txt').toString().split("\n");
 var snapshotOct = fs.readFileSync('snapshot_october.txt').toString().split("\n");
 
 if (seed.length !== 81) {
-  console.error("Seed is not 81 characters!")
-  return
+  if(seed.length < 81){
+    var charsToAdd = 81 - seed.length;
+    var oldSeed = seed;
+    for (let i = 0; i < charsToAdd; i++){
+      seed = oldSeed.concat("9");
+    }
+    return;
+  }
+  if(seed.length > 81){
+    var oldSeed = seed;
+    seed = oldSeed.substring(0, 82);
+    return;
+  }
 }
 
 const readline = require('readline');
@@ -119,7 +130,7 @@ var check = (index) => {
     }, function (e, d) {
       getNewAddressCallback(e, d, index, amountToScan);
     });
-  } 
+  }
   else {
     var f = iotaOld.api.getNewAddress(seed, {
       index,
