@@ -14,12 +14,15 @@ Ensure you have the following:
 - NodeJS which you can download from https://nodejs.org
 
 Run the following commands in Terminal or PowerShell:
-- `git clone https://github.com/rajivshah3/IOTA-Balance-Finder balance-finder`
+- `git clone --recursive https://github.com/rajivshah3/IOTA-Balance-Finder balance-finder`
 - `cd balance-finder`
 - `npm install`
 - `node main.js <seed>` Make sure to remove the < and >!
 - Sit back and watch as the tool will find balances that are linked to your seed.
 - When you think you have all your balances, simply hit the `i`-key.
+
+For Searching pre-Transitioned Addresses add a second parameter "p":
+- `node main.js <seed> p`
 
 ## What to do next
 - If the tool says `The balance is currently in the address` to all addresses found, see the snapshot recovery instructions below.
