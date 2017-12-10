@@ -7,8 +7,8 @@ var getPreTransitionIota = function() {
   var oldIotaPath = './pre-trans-generator/js/iota.js'
   filedata = fs.readFileSync(oldIotaPath,'utf8');
 
-  // Small tweak to allow this to work outside of the browser
-  filedata = 'window={};' + filedata;
+  // Small tweaks to allow this to work outside of the browser
+  filedata = 'window={};console={\'log\':function(){}};' + filedata;
 
   var context = {};
   vm.runInNewContext(filedata, context, oldIotaPath);
