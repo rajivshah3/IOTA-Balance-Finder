@@ -32,15 +32,14 @@ if (seed.length !== 81) {
   if(seed.length < 81){
     var charsToAdd = 81 - seed.length;
     var oldSeed = seed;
-    for (let i = 0; i < charsToAdd; i++){
+    var i = 0;
+    for (i = 0; i < charsToAdd; i++){
       seed = oldSeed.concat("9");
     }
-    return;
   }
   if(seed.length > 81){
     var oldSeed = seed;
     seed = oldSeed.substring(0, 82);
-    return;
   }
 }
 
