@@ -38,7 +38,7 @@ Run these commands to transfer your balance to a new seed. Ensure that you are n
 
 ## Did this tool help you?
 Please consider donating to help create more tools like this:
-`RAJQDPHWBXSSSCLXLCUAIALSILPNBFCDRYLKZWWKVCLWXSLPTKAAN9XM9BNDPCDVJMQHLDWVYRYSYSLZCMUTATRK9D`
+`VKOXMJJAWRVXZHNUHLRWCXMRVPRLCUUNLEZQVHWPRLJGLJPZNAFHQTQZ9YWEPTTEFUUQNVOORJAXNMAQZQMHACRLHB`
 
 ## How it works
 
