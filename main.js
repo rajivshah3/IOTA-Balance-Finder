@@ -1,29 +1,47 @@
-var vm = require("vm");
+// var vm = require("vm");
 var fs = require('fs');
 
-
+/*
 // Load the old JS file (meant for the web and not for node) for old (pre-transitioned) address generation
 var getPreTransitionIota = function() {
-  var oldIotaPath = './pre-trans-generator/js/iota.js'
-  filedata = fs.readFileSync(oldIotaPath,'utf8');
+var oldIotaPath = './pre-trans-generator/js/iota.js'
+filedata = fs.readFileSync(oldIotaPath,'utf8');
 
-  // Small tweaks to allow this to work outside of the browser
-  filedata = 'window={};console={\'log\':function(){}};' + filedata;
+// Small tweaks to allow this to work outside of the browser
+filedata = 'window={};console={\'log\':function(){}};' + filedata;
 
-  var context = {};
-  vm.runInNewContext(filedata, context, oldIotaPath);
+var context = {};
+vm.runInNewContext(filedata, context, oldIotaPath);
 
-  return new context.window.IOTA();
+return new context.window.IOTA();
 }
+*/
 
 
 var IOTA = require('iota.lib.js');
 var iota = new IOTA({
   'provider': 'https://iotanode.us:443'
 });
-var iotaOld = getPreTransitionIota();
+// var iotaOld = getPreTransitionIota();
 var seed = process.argv[2] + "" // in case the seed is all 9's (GOSH I HOPE NOT)
-var searchPreTransitioned = process.argv[3] === 'p';
+// var searchPreTransitioned = process.argv[3] === 'p';
+if(process.argv[3]){
+  depositSeed = process.argv[3];
+  if (depositSeed.length !== 81) {
+    if(depositSeed.length < 81){
+      var charsToAdd = 81 - depositSeed.length;
+      var oldDepositSeed = depositSeed;
+      var i = 0;
+      for (i = 0; i < charsToAdd; i++){
+        seed = oldDepositSeed.concat("9");
+      }
+    }
+    if(depositSeed.length > 81){
+      var oldDepositSeed = seed;
+      depositSeed = oldDepositSeed.substring(0, 82);
+    }
+  }
+}
 var status = 'checking'
 var snapshotJan = fs.readFileSync('Snapshot.txt').toString().split("\n");
 
@@ -50,7 +68,7 @@ process.stdin.on('keypress', (str, key) => {
     process.exit();
   } else {
     if (key.name === 'i') {
-      process.exit();
+      status = "done";
     }
   }
 })
@@ -72,29 +90,67 @@ var getNewAddressCallback = function(e, d, index, amountToScan) {
         console.log(`Got a hit! ${addr} has a balance of ${convertedBalance} Mi.`)
       }
 
-        totalBalance += balance
-        addressesWithBalances.push({
-          address: addr,
-          balance,
-          keyIndex: index + i,
-          security: 2
-        })
-        hits++
-      }
+      totalBalance += balance
+      addressesWithBalances.push({
+        address: addr,
+        balance,
+        keyIndex: index + i,
+        security: 2
+      })
+      hits++
     }
-    if (status === 'checking') {
+  }
+  if (status === 'checking') {
     setTimeout(function() {
       check(index + amountToScan)
     }, 100)
   }
+  else {
+    var f = iota.api.getNewAddress(depositSeed, {
+      index: 0,
+      checksum: false,
+    }, function(e, d) {
+      var depositAddr = d
+      var addressNotSpent = false;
+      iota.api.wereAddressesSpentFrom(depositAddr, function(e,s){
+        if(e){
+          console.log("Error");
+        }
+        if(s){
+          addressNotSpent = s[0];
+        }
+      });
+      if(depositAddr.length === 81) {
+        if(addressNotSpent){
+          var transfers = [{
+            'address': depositAddr,
+            'value': totalBalance,
+            'tag': 'BALANCE9FINDER'
+          }];
+          console.log(`Sending money to ${depositAddr}...`);
+          iota.api.sendTransfer(seed, 3, 14, transfers, function(e, s){
+            if (e){
+              console.log("Error:" + e);
+            }
+
+            if (s){
+              console.log("Sent! Transaction hash: " + s.hash);
+            }
+          });
+        }
+        else {
+          console.log("Error: Deposit address has been spent from");
+        }
+      }
+      else {
+        console.error('Deposit address generation failed! No money has been sent.');
+      }
+    })
+  }
 };
 
 
-if (searchPreTransitioned) {
-  console.log('Address Search Type: Pre-Transitioned');
-} else {
-  console.log('Address Search Type: Regular');
-}
+console.log('Address Search Type: Regular');
 
 console.log('Checking your balance...Press i at any time to stop...');
 var addressesWithBalances = []
@@ -103,25 +159,13 @@ var totalBalance = 0
 var check = (index) => {
   console.log('Checking for new addresses');
   const amountToScan = 2;
-
-  if (!searchPreTransitioned) {
-    var f = iota.api.getNewAddress(seed, {
-      index,
-      total: amountToScan,
-      checksum: false
-    }, function (e, d) {
-      getNewAddressCallback(e, d, index, amountToScan);
-    });
-  }
-  else {
-    var f = iotaOld.api.getNewAddress(seed, {
-      index,
-      total: amountToScan,
-      checksum: false
-    }, function (e, d) {
-      getNewAddressCallback(e, d, index, amountToScan);
-    });
-  }
+  var f = iota.api.getNewAddress(seed, {
+    index,
+    total: amountToScan,
+    checksum: false
+  }, function (e, d) {
+    getNewAddressCallback(e, d, index, amountToScan);
+  });
 }
 
 check(0)
