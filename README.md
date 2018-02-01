@@ -1,6 +1,6 @@
 # IOTA Balance Finder
 
-Using this tool you can find where your balances are after a snapshot and choose the appropriate action (reclaim, generate addresses, etc).
+Using this tool you can find where your balances are after a snapshot and even send the funds to a new seed if needed.
 
 This is adapted from https://github.com/peterwilli/IOTA-Snapshot-Recovery
 
