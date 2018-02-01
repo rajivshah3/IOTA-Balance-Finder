@@ -23,7 +23,8 @@ var iota = new IOTA({
   'provider': 'https://iotanode.us:443'
 });
 // var iotaOld = getPreTransitionIota();
-var seed = process.argv[2] + "" // in case the seed is all 9's (GOSH I HOPE NOT)
+var seed = process.argv[2] + "";
+var depositSeed = "";
 // var searchPreTransitioned = process.argv[3] === 'p';
 if(process.argv[3]){
   depositSeed = process.argv[3];
@@ -106,46 +107,62 @@ var getNewAddressCallback = function(e, d, index, amountToScan) {
     }, 100)
   }
   else {
-    var f = iota.api.getNewAddress(depositSeed, {
-      index: 0,
-      checksum: false,
-    }, function(e, d) {
-      var depositAddr = d
-      var addressNotSpent = false;
-      iota.api.wereAddressesSpentFrom(depositAddr, function(e,s){
-        if(e){
-          console.log("Error");
-        }
-        if(s){
-          addressNotSpent = s[0];
-        }
-      });
-      if(depositAddr.length === 81) {
-        if(addressNotSpent){
-          var transfers = [{
-            'address': depositAddr,
-            'value': totalBalance,
-            'tag': 'BALANCE9FINDER'
-          }];
-          console.log(`Sending money to ${depositAddr}...`);
-          iota.api.sendTransfer(seed, 3, 14, transfers, function(e, s){
-            if (e){
-              console.log("Error:" + e);
+    if(depositSeed !== ""){
+      if (iota.valid.isTrytes(depositSeed, 81)) {
+        var f = iota.api.getNewAddress(depositSeed, {
+          index: 0,
+          checksum: false,
+        }, function(e, d) {
+          var depositAddr = d
+          var addressNotSpent = false;
+          iota.api.wereAddressesSpentFrom(depositAddr, function(e,s){
+            if(e){
+              console.log("Error");
+              process.exit();
             }
-
-            if (s){
-              console.log("Sent! Transaction hash: " + s.hash);
+            if(s){
+              addressNotSpent = s[0];
             }
           });
-        }
-        else {
-          console.log("Error: Deposit address has been spent from");
-        }
+          if(depositAddr.length === 81) {
+            if(addressNotSpent){
+              var transfers = [{
+                'address': depositAddr,
+                'value': totalBalance,
+                'tag': 'BALANCE9FINDER'
+              }];
+              console.log(`Sending money to ${depositAddr}...`);
+              iota.api.sendTransfer(seed, 3, 14, transfers, function(e, s){
+                if (e){
+                  console.log("Error:" + e);
+                  process.exit();
+                }
+
+                if (s){
+                  console.log("Sent! Transaction hash: " + s.hash);
+                  process.exit();
+                }
+              });
+            }
+            else {
+              console.log("Error: Deposit address has been spent from");
+              process.exit();
+            }
+          }
+          else {
+            console.error('Deposit address generation failed! No money has been sent.');
+            process.exit();
+          }
+        });
       }
       else {
-        console.error('Deposit address generation failed! No money has been sent.');
+        console.log("Invalid deposit seed");
+        process.exit();
       }
-    })
+    }
+    else{
+      process.exit();
+    }
   }
 };
 
