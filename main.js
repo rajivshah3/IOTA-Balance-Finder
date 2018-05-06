@@ -44,7 +44,7 @@ if(process.argv[3]){
   }
 }
 var status = 'checking'
-var snapshotJan = fs.readFileSync('Snapshot.txt').toString().split("\n");
+var snapshotApr = fs.readFileSync('Snapshot.txt').toString().split("\n");
 
 if (seed.length !== 81) {
   if(seed.length < 81){
@@ -78,7 +78,7 @@ var getNewAddressCallback = function(e, d, index, amountToScan) {
   var hits = 0
   for (var i = 0; i < d.length; i++) {
     var addr = d[i]
-    var hit = snapshotJan.filter((s) => {
+    var hit = snapshotApr.filter((s) => {
       return s.indexOf(addr) > -1
     })
 
@@ -86,7 +86,7 @@ var getNewAddressCallback = function(e, d, index, amountToScan) {
       var snapshotDate = ""
       var balance = 0
       if(hit.length > 0){
-        balance = parseInt(snapshotJan[snapshotJan.indexOf(hit[0])].split(";")[1])
+        balance = parseInt(snapshotApr[snapshotApr.indexOf(hit[0])].split(";")[1])
         var convertedBalance = balance / 1000000
         console.log(`Got a hit! ${addr} has a balance of ${convertedBalance} Mi.`)
       }
